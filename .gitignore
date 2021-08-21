@@ -9,7 +9,6 @@ pypy
 *.pyc
 tags
 tags.*
-build
 docs/_build
 pidfile
 *.rdb
@@ -17,3 +16,5 @@ pidfile
 *.tar.*
 *.zip
 .env
+*build*
+sphinx-template/build
