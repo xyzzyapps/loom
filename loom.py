@@ -2,7 +2,47 @@ from flexicon import Lexer
 import re
 import sys
 import os
+import sqlite3
+from sqlite3 import Error
 
+conn = None
+
+def execute(conn, query, args):
+    cur = conn.cursor()
+    cur.execute(query, args)
+    conn.commit()
+    return cur.lastrowid
+
+def create_connection(db_file):
+    """ create a database connection to a SQLite database """
+    conn = None
+    try:
+        conn = sqlite3.connect(db_file)
+        return conn
+    except Error as e:
+        print(e)
+
+
+sql_create_codebase_table = """
+CREATE TABLE IF NOT EXISTS codebase (
+    file_path text NOT NULL,
+    array_index integer NOT NULL,
+    type text NOT NULL,
+    line text NOT NULL
+);
+"""
+
+def create_table(conn, create_table_sql):
+    """ create a table from the create_table_sql statement
+    :param conn: Connection object
+    :param create_table_sql: a CREATE TABLE statement
+    :return:
+    """
+    try:
+        c = conn.cursor()
+        c.execute(create_table_sql)
+    except Error as e:
+        print(e)
 def dir_walk(dir, mapper):
     for root, dirs, files in os.walk(dir):
         for file in files:
@@ -49,8 +89,8 @@ def string_state():
 def parse(st, print_wrapper, code_wrapper):
     lexer = Lexer().simple(
         (r'(\n[\n ]*)', lambda _1: ('NL', _1)),
-        (r'^(#.+\n)', lambda _1: ('COMMENT', _1)),
-        (r'(\s*)(.+)(#.+\n)', lambda _1, _2, _3: ('PARTIAL_COMMENT', _1, _2, _3)),
+        (r'^#(.+\n)', lambda _1: ('COMMENT', _1)),
+        (r'(\s*)(.+)#(.+\n)', lambda _1, _2, _3: ('PARTIAL_COMMENT', _1, _2, _3)),
         (r'^(\s*)(.+\n)', lambda _1, _2: ('LINE', _1, _2)),
     )
 
@@ -72,30 +112,37 @@ def parse(st, print_wrapper, code_wrapper):
             is_program_beginning = False
 
         if token[0] == "COMMENT":
-            print_wrapper(token[1])
             current_comment_sequence += token[1]
             line_count += 1
         if token[0] == "PARTIAL_COMMENT":
-            print_wrapper(token[3])
             current_code_sequence += token[1]
             current_code_sequence += token[2]
-            code_wrapper(token[1] + token[2])
             current_comment_sequence += token[3]
             line_count += 1
         if token[0] == "LINE":
             current_code_sequence += token[2]
             if len(token[1]) == 0:
-                code_sequences.append(current_code_sequence)
-                comment_sequences.append(current_comment_sequence)
-                current_code_sequence = ""
-                current_comment_sequence = ""
-            code_wrapper(token[2])
+                if current_code_sequence != "" and current_comment_sequence != "":
+                    code_sequences.append(current_code_sequence)
+                    comment_sequences.append(current_comment_sequence)
+                    current_code_sequence = ""
+                    current_comment_sequence = ""
             line_count += 1
         else:
             line_count += 1
 
-    code_sequences.append(current_code_sequence)
-    comment_sequences.append(current_comment_sequence)
+    if current_code_sequence != "" and current_comment_sequence != "":
+        code_sequences.append(current_code_sequence)
+        comment_sequences.append(current_comment_sequence)
+
+    for comment in comment_sequences:
+        print_wrapper(comment)
+    code_wrapper("\n```")
+    for code in code_sequences:
+        code_wrapper(code)
+    print_wrapper("\n```")
+
+    return [code_sequences, comment_sequences]
 
 
 if __name__ == "__main__":
@@ -103,21 +150,37 @@ if __name__ == "__main__":
     arg1 = sys.argv[1]
 
     if arg1 == "--test":
-        parse(sys.stdin.read(), null_printer, output_printer)
+        parse(sys.stdin.read(), output_printer, null_printer)
 
 
     if arg1 == "--generate-docs":
 
+        os.system("safe-rm codedb.db")
+        conn = create_connection("codedb.db")
+        create_table(conn, sql_create_codebase_table)
+
+        arg2 = sys.argv[2]
         output_dir = ends_with_slash(sys.argv[3])
 
         def run_parser(file_name):
+            global conn
             file_contents = open(file_name).read()
             file_printer = file_printer_prototype(output_dir, file_name)
-            parse(file_contents, file_printer, output_printer)
+            sequences = parse(file_contents, file_printer, file_printer)
+            sql = ''' INSERT INTO codebase(file_path, array_index, type, line)
+                VALUES(?,?,?,?) '''
+            for i, e in enumerate(sequences[0]):
+                execute(conn, sql, [file_name, i, "code", e])
+            for i, e in enumerate(sequences[1]):
+                execute(conn, sql, [file_name, i, "comment", e])
+
 
         dir_walk(arg2, run_parser)
 
     if arg1 == "--generate-index":
+
+        arg2 = sys.argv[2]
+
         print("""Welcome
 =======
 
