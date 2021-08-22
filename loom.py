@@ -1,5 +1,7 @@
 from flexicon import Lexer
+from operator import itemgetter
 import re
+import time
 import sys
 import os
 import sqlite3
@@ -195,5 +197,36 @@ if __name__ == "__main__":
         def run_parser(file_name):
             print("    " + re.sub(arg2 + "/", "", file_name))
 
+    if arg1 == "--generate-terminal-show":
+
+        show = {}
+        arg2 = sys.argv[2]
+        output_dir = ends_with_slash(sys.argv[3])
+
+        def run_parser(file_name):
+            global conn
+            global show
+            file_contents = open(file_name).read()
+            file_printer = file_printer_prototype(output_dir, file_name)
+            sequences = parse(file_contents, file_printer, file_printer)
+            sql = '''INSERT INTO codebase(file_path, array_index, type, line)
+                VALUES(?,?,?,?)'''
+
+            for i, e in enumerate(sequences[1]):
+                if "animation::" in e:
+                    lines = e.split("\n")
+                    name, no = lines[0].split("::")[1].split(":")
+
+                    if name in show:
+                        code = sequences[0][i]
+                        show[name].append([no, e, code])
+                    else:
+                        code = sequences[0][i]
+                        show[name] = [[no, e, code]]
+
+
         dir_walk(arg2, run_parser)
+        for slide in sorted(show["start"], key=itemgetter(0)):
+            print(slide[2])
+            time.sleep(5)
 

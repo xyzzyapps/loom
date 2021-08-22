@@ -1,3 +1,4 @@
+# animation::start:2
 # In programming, infinite doesn't exist. You can use a recursive form translating the math form directly in your language, for example in Python it becomes:
 
 def F(n):

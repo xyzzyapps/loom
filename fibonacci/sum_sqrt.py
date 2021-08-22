@@ -1,5 +1,6 @@
 from math import sqrt
 
+# animation::start:1
 # Go on on the sites I linked to you and will see this (on wolfram)
 # <img src="https://i.stack.imgur.com/SPYOU.gif/>
 
