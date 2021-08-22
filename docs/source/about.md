@@ -1,11 +1,10 @@
 # Loom
 
-Sumbission for langjam#0001
+Submission for langjam#0001
 
+I have been exploring literate programming and animation, the past few months so the langjam topic came as a surprise! While the initial goal was to build something like docco, I realised I could do an animation inside comments using a dsl. This is a prototype of an animated approach to literate programming first invented by Don Knuth. The code rendering time is long with terminalizer which I had not anticipated. There is an option that will strip code and store comment sequences inside a sqlite for fun and its used to explore a new metric of code quality - lines of comment / lines of code.
 
-I have been exploring literate programming and animation, the past few months so the langjam topic came as a surprise! While the inital goal was to build something like docco, I realised I could do an animation inside comments using a dsl. This is a prototype of an animated approach to literate programming first invented by Don Knuth. The code rendering time is surprisingly long with terminalizer which I had not anticipated. There is also an option that will strip code and store comment sequences inside a sqlite for fun and it is used to explore a new metric of code quality - lines of comment / lines of code.
-
-first-class comments (interpretation): treat comment sequences as a value that can be freely passed, stored, serialized ... like python dictionaries + pickle or integers. A comment sequence is something seprated by 0-width indentaition of  codeblocks for now.
+first-class comments (interpretation): treat comment sequences as a value that can be freely passed, stored, serialized ... like python dictionaries + pickle or integers. A comment sequence is something separated by 0-width indentation of  codeblocks for now.
 
 Examples include - hello-world and fibonacci
 
@@ -27,7 +26,7 @@ pip install -r requirements.txt
 python loom.py test.py
 ```
 
-Additional utilities for animation,
+Utilities for animation,
 
 ```sh
 brew install cowsay
@@ -50,7 +49,7 @@ Unless stated otherwise, all source code in this document and the documentation 
 
 # About
 
-I'm xyzzy for now. I'm a web developer into music and #creativeprogramming. I'm a solopreneur. Checkout my [apps](https://xyzzyapps.link) where I explore "procedural" literate programming to build practical apps. I have written a literate programming tool with the help of [cog preprocessor](https://nedbatchelder.com/code/cog/) called wheel. I am currently exploring 3d animation with blender and using python as a replacement for cpp in [raptor](https://xyzzyapps.link) ^_^
+I'm xyzzy! I'm a web developer into music and #creativeprogramming. I'm a solopreneur. Checkout my [apps](https://xyzzyapps.link) where I explore "procedural" literate programming to build practical apps. I have written a literate programming tool with the help of [cog preprocessor](https://nedbatchelder.com/code/cog/) called wheel. I am exploring 3d animation with blender and using python as a replacement for cpp in [raptor](https://xyzzyapps.link) these days ^_^
 
 
 
