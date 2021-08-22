@@ -22,7 +22,6 @@ def select_query(conn, query, params, mapper):
         cur.execute(query, params)
     else:
         cur.execute(query)
-
     rows = cur.fetchall()
 
     for row in rows:
@@ -101,12 +100,12 @@ def string_state():
 
     return [getter, setter]
 
-def parse(st, print_wrapper, code_wrapper):
+def parse(st, print_wrapper, code_wrapper, with_fence=True):
     lexer = Lexer().simple(
-        (r'(\n[\n ]*)', lambda _1: ('NL', _1)),
+        (r'(\n[\n]*)', lambda _1: ('NL', _1)),
         (r'^#(.+\n)', lambda _1: ('COMMENT', _1)),
-        (r'(\s*)(.+)#(.+\n)', lambda _1, _2, _3: ('PARTIAL_COMMENT', _1, _2, _3)),
-        (r'^(\s*)(.+\n)', lambda _1, _2: ('LINE', _1, _2)),
+        (r'^(\s*)(.+?)#(.+\n)', lambda _1, _2, _3: ('PARTIAL_COMMENT', _1, _2, _3)),
+        (r'^(\s*?)(.+\n)', lambda _1, _2: ('LINE', _1, _2)),
     )
 
     tokens = lexer.lex(st)
@@ -131,7 +130,8 @@ def parse(st, print_wrapper, code_wrapper):
             current_comment_sequence += token[1]
             line_count += 1
         if token[0] == "PARTIAL_COMMENT":
-            current_code_sequence += token[1]
+            if len(token[2]) > 0:
+                current_code_sequence += token[1]
             current_code_sequence += token[2]
             current_comment_sequence += token[3]
             line_count += 1
@@ -161,10 +161,12 @@ def parse(st, print_wrapper, code_wrapper):
 
     for comment in comment_sequences:
         print_wrapper(comment)
-    code_wrapper("\n```")
+    if with_fence:
+        code_wrapper("\n```")
     for code in code_sequences:
         code_wrapper(code)
-    print_wrapper("\n```")
+    if with_fence:
+        print_wrapper("\n```")
 
     return [code_sequences, comment_sequences]
 
@@ -173,8 +175,8 @@ if __name__ == "__main__":
 
     arg1 = sys.argv[1]
 
-    if arg1 == "--test":
-        parse(sys.stdin.read(), output_printer, null_printer)
+    if arg1 == "--clean-source":
+        parse(sys.stdin.read(), null_printer, output_printer, with_fence=False)
 
     if arg1 == "--generate-docs":
 
@@ -243,8 +245,15 @@ if __name__ == "__main__":
 
                     if name in show:
                         code = sequences[0][i]
-                        show[name].append([no, clean_comment, code])
+                        if "," in no:
+                            ns = no.split(",")
+                            for n in ns:
+                                show[name].append([n, clean_comment, code])
+                        else:
+                            show[name].append([no, clean_comment, code])
                     else:
+                        if "," in no:
+                            ns = no.split(",")
                         code = sequences[0][i]
                         show[name] = [[no, clean_comment, code]]
 
