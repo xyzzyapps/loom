@@ -13,12 +13,14 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/analytics.js"></script>
+    <script async="async" data-goatcounter="https://analytics.xyzzyapps.link/count" src="https://analytics.xyzzyapps.link/count.js"></script>
     <link rel="canonical" href="https://xyzzyapps.github.io/loom/about.html" />
     <link rel="author" title="About these documents" href="#" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="References" href="references.html" />
-    <link rel="prev" title="Welcome to Project’s documentation!" href="index.html" />
+    <link rel="prev" title="Welcome to Loom’s documentation!" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -39,29 +41,46 @@
 <h1>Loom<a class="headerlink" href="#loom" title="Permalink to this headline">¶</a></h1>
 <p>Submission for langjam#0001</p>
 <p>I have been exploring literate programming and animation, the past few months so the langjam topic came as a surprise! While the initial goal was to build something like docco, I realised I could do an animation inside comments using a dsl. This is a prototype of an animated approach to literate programming first invented by Don Knuth. The code rendering time is long with terminalizer which I had not anticipated. There is an option that will strip code and store comment sequences inside a sqlite for fun and its used to explore a new metric of code quality - lines of comment / lines of code.</p>
+<p>The animation dsl</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>dir/file1.py
+
+# animation::&lt;name&gt;:no1
+# ...
+# ...
+
+
+dir/file2.py
+
+# animation::name:no
+# ...
+# ...
+</pre></div>
+</div>
 <p>first-class comments (interpretation): treat comment sequences as a value that can be freely passed, stored, serialized … like python dictionaries + pickle or integers. A comment sequence is something separated by 0-width indentation of  codeblocks for now.</p>
 <p>Examples include - hello-world and fibonacci</p>
-<p>Limitations - some edge cases need to be explored.</p>
+<p>Limitations - a lot!</p>
 </section>
-<section class="tex2jax_ignore mathjax_ignore" id="is-this-a-quine">
-<h1>Is this a quine ?<a class="headerlink" href="#is-this-a-quine" title="Permalink to this headline">¶</a></h1>
+<section class="tex2jax_ignore mathjax_ignore" id="demo">
+<h1>Demo<a class="headerlink" href="#demo" title="Permalink to this headline">¶</a></h1>
+<img src="_static/render1629596256328.gif">
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="instructions">
 <h1>Instructions<a class="headerlink" href="#instructions" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>virtualenv env
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/xyzzyapps/loom.git
+<span class="nb">cd</span> loom
+virtualenv env
 <span class="nb">source</span> env/bin/activate
 pip install -r requirements.txt
-python loom.py test.py
 </pre></div>
 </div>
 <p>Utilities for animation,</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>brew install cowsay
-npm install -g terminalizer 
+npm install -g terminalizer
 </pre></div>
 </div>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python source/loom.py --generate-docs fibonacci build1 <span class="c1"># builds the db and docco like docs with sphinx</span>
 python source/loom.py --comment-stats <span class="c1"># previous step is needed to create the database</span>
-python source/loom.py --generate-terminal-show fibonacci build2 <span class="m">3</span>
+python source/loom.py --generate-terminal-show fibonacci build2 <span class="m">3</span> start
 python source/loom.py --clean-source &lt; hello-world/test.py
 </pre></div>
 </div>
@@ -97,7 +116,7 @@ python source/loom.py --clean-source &lt; hello-world/test.py
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Loom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#is-this-a-quine">Is this a quine ?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#demo">Demo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#instructions">Instructions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#license-support">License Support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#about">About</a></li>
@@ -108,7 +127,7 @@ python source/loom.py --clean-source &lt; hello-world/test.py
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Project’s documentation!</a></li>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Loom’s documentation!</a></li>
       <li>Next: <a href="references.html" title="next chapter">References</a></li>
   </ul></li>
 </ul>
@@ -136,7 +155,7 @@ python source/loom.py --clean-source &lt; hello-world/test.py
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2021, Xyzzy.
+      &copy;2021, Xyzzy Apps.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 4.1.2</a>
