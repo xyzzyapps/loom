@@ -13,9 +13,12 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <link rel="canonical" href="https://xyzzyapps.github.io/loom/about.html" />
     <link rel="author" title="About these documents" href="#" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="References" href="references.html" />
+    <link rel="prev" title="Welcome to Project’s documentation!" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -34,10 +37,11 @@
             
   <section class="tex2jax_ignore mathjax_ignore" id="loom">
 <h1>Loom<a class="headerlink" href="#loom" title="Permalink to this headline">¶</a></h1>
-<p>Sumbission for langjam#0001</p>
-<p>While the inital goal was to build something like docco, later I realised I could do something like an animation inside comments using a dsl. The code rendering time is surprisingly long which I had not anticipated. There is also an options that will strip code and store comment sequences inside a sqlite for fun and it is used to explore a new metric of code quality - lines of comment / lines of code.</p>
-<p>first-class comments (interpretation): treat comment sequences as a value that can be freely passed, stored … like python dictionaries + pickle or intergers. A comment sequence is something seprated by 0-width indentaition of  codeblocks.</p>
+<p>Submission for langjam#0001</p>
+<p>I have been exploring literate programming and animation, the past few months so the langjam topic came as a surprise! While the initial goal was to build something like docco, I realised I could do an animation inside comments using a dsl. This is a prototype of an animated approach to literate programming first invented by Don Knuth. The code rendering time is long with terminalizer which I had not anticipated. There is an option that will strip code and store comment sequences inside a sqlite for fun and its used to explore a new metric of code quality - lines of comment / lines of code.</p>
+<p>first-class comments (interpretation): treat comment sequences as a value that can be freely passed, stored, serialized … like python dictionaries + pickle or integers. A comment sequence is something separated by 0-width indentation of  codeblocks for now.</p>
 <p>Examples include - hello-world and fibonacci</p>
+<p>Limitations - some edge cases need to be explored.</p>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="is-this-a-quine">
 <h1>Is this a quine ?<a class="headerlink" href="#is-this-a-quine" title="Permalink to this headline">¶</a></h1>
@@ -50,14 +54,15 @@ pip install -r requirements.txt
 python loom.py test.py
 </pre></div>
 </div>
-<p>Additional utilities for animation,</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">brew</span> <span class="n">install</span> <span class="n">cowsay</span>
-<span class="n">npm</span> <span class="n">install</span> <span class="o">-</span><span class="n">g</span> <span class="n">terminalizer</span> 
+<p>Utilities for animation,</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>brew install cowsay
+npm install -g terminalizer 
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">source</span><span class="o">/</span><span class="n">loom</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">generate</span><span class="o">-</span><span class="n">docs</span> <span class="n">fibonacci</span> <span class="n">build1</span>
-<span class="n">python</span> <span class="n">source</span><span class="o">/</span><span class="n">loom</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">comment</span><span class="o">-</span><span class="n">stats</span>
-<span class="n">python</span> <span class="n">loom</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">generate</span><span class="o">-</span><span class="n">terminal</span><span class="o">-</span><span class="n">show</span> <span class="n">fibonacci</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python source/loom.py --generate-docs fibonacci build1 <span class="c1"># builds the db and docco like docs with sphinx</span>
+python source/loom.py --comment-stats <span class="c1"># previous step is needed to create the database</span>
+python source/loom.py --generate-terminal-show fibonacci build2 <span class="m">3</span>
+python source/loom.py --clean-source &lt; hello-world/test.py
 </pre></div>
 </div>
 </section>
@@ -65,11 +70,11 @@ python loom.py test.py
 <h1>License Support<a class="headerlink" href="#license-support" title="Permalink to this headline">¶</a></h1>
 <p>Unless stated otherwise, all source code in this document and the documentation itself is under the <a class="reference external" href="https://creativecommons.org/licenses/by-nc-nd/4.0">Creative Commons Attribution Non Commercial No Derivatives</a> license.</p>
 <script src="https://gumroad.com/js/gumroad.js"></script>
-<p><a class="gumroad-button" href="https://gumroad.com/l/pkoQc">Support Loom</a></p>
+<p><a class="gumroad-button" href="https://gumroad.com/l/pkoQc">Support Loom on Gumroad</a></p>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="about">
 <h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
-<p>I’m xyzzy for now. I’m a web developer into music and creative programming. I’m a solopreneur. Checkout my <a class="reference external" href="https://xyzzyapps.link">apps</a> where I explore literate programming. I have written my own tool with the help of cog preprocessor called wheel. I am currently exploring 3d animation with blender.</p>
+<p>I’m xyzzy! I’m a web developer into music and #creativeprogramming. I’m a solopreneur. Checkout my <a class="reference external" href="https://xyzzyapps.link">apps</a> where I explore “procedural” literate programming to build practical apps. I have written a literate programming tool with the help of <a class="reference external" href="https://nedbatchelder.com/code/cog/">cog preprocessor</a> called wheel. I am exploring 3d animation with blender and using python as a replacement for cpp in <a class="reference external" href="https://xyzzyapps.link">raptor</a> these days ^_^</p>
 </section>
 
 
@@ -89,11 +94,22 @@ python loom.py test.py
 
 
 <h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Loom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#is-this-a-quine">Is this a quine ?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#instructions">Instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#license-support">License Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#about">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Project’s documentation!</a></li>
+      <li>Next: <a href="references.html" title="next chapter">References</a></li>
   </ul></li>
 </ul>
 </div>
