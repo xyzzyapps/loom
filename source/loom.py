@@ -1,3 +1,7 @@
+# animation::quine:1
+# Welcome!
+# imports
+
 from flexicon import Lexer
 import tempfile
 from operator import itemgetter
@@ -8,13 +12,22 @@ import os
 import sqlite3
 from sqlite3 import Error
 
+# animation::quine:2
+# globals
+
 conn = None
+
+# animation::quine:3
+# basic sql
 
 def execute(conn, query, args):
     cur = conn.cursor()
     cur.execute(query, args)
     conn.commit()
     return cur.lastrowid
+
+# animation::quine:4
+# basic sql
 
 def select_query(conn, query, params, mapper):
     cur = conn.cursor()
@@ -27,6 +40,8 @@ def select_query(conn, query, params, mapper):
     for row in rows:
         mapper(row)
 
+# animation::quine:5
+
 def create_connection(db_file):
     """ create a database connection to a SQLite database """
     conn = None
@@ -36,6 +51,7 @@ def create_connection(db_file):
     except Error as e:
         print(e)
 
+# animation::quine:6
 
 sql_create_codebase_table = """
 CREATE TABLE IF NOT EXISTS codebase (
@@ -45,6 +61,8 @@ CREATE TABLE IF NOT EXISTS codebase (
     line text NOT NULL
 );
 """
+
+# animation::quine:6
 
 def create_table(conn, create_table_sql):
     """ create a table from the create_table_sql statement
@@ -57,6 +75,7 @@ def create_table(conn, create_table_sql):
         c.execute(create_table_sql)
     except Error as e:
         print(e)
+
 def dir_walk(dir, mapper):
     for root, dirs, files in os.walk(dir):
         for file in files:
@@ -100,12 +119,14 @@ def string_state():
 
     return [getter, setter]
 
+# animation::quine:7
+
 def parse(st, print_wrapper, code_wrapper, with_fence=True):
     lexer = Lexer().simple(
-        (r'(\n[\n]*)', lambda _1: ('NL', _1)),
+        (r'(\n[\n ]*)', lambda _1: ('NL', _1)),
         (r'^#(.+\n)', lambda _1: ('COMMENT', _1)),
-        (r'^(\s*)(.+?)#(.+\n)', lambda _1, _2, _3: ('PARTIAL_COMMENT', _1, _2, _3)),
-        (r'^(\s*?)(.+\n)', lambda _1, _2: ('LINE', _1, _2)),
+        (r'(\s*)(.+?)#(.+\n)', lambda _1, _2, _3: ('PARTIAL_COMMENT', _1, _2, _3)),
+        (r'^(\s*)(.+\n)', lambda _1, _2: ('LINE', _1, _2)),
     )
 
     tokens = lexer.lex(st)
@@ -140,8 +161,6 @@ def parse(st, print_wrapper, code_wrapper, with_fence=True):
             current_code_sequence += token[2]
             if len(token[1]) == 0:
                 if current_code_sequence != "" and current_comment_sequence != "":
-                    # print(str(sequence_index) + "@@@@@@" + current_code_sequence)
-                    # print(str(sequence_index) + "@@@@@@" + current_comment_sequence)
                     code_sequences.append(current_code_sequence)
                     comment_sequences.append(current_comment_sequence)
                     sequence_index += 1
@@ -153,9 +172,6 @@ def parse(st, print_wrapper, code_wrapper, with_fence=True):
             line_count += 1
 
     if current_code_sequence != "" and current_comment_sequence != "":
-        # print(str(sequence_index) + "@@@@@@" + current_code_sequence)
-        # print(str(sequence_index) + "@@@@@@" + current_comment_sequence)
-
         code_sequences.append(current_code_sequence)
         comment_sequences.append(current_comment_sequence)
 
@@ -226,6 +242,7 @@ if __name__ == "__main__":
         arg2 = sys.argv[2]
         output_dir = ends_with_slash(sys.argv[3])
         slide_delay = int(sys.argv[4])
+        animation_name = sys.argv[5]
 
         def run_parser(file_name):
             global conn
@@ -259,7 +276,7 @@ if __name__ == "__main__":
 
         dir_walk(arg2, run_parser)
 
-        for slide in sorted(show["start"], key=itemgetter(0)):
+        for slide in sorted(show[animation_name], key=itemgetter(0)):
             with tempfile.NamedTemporaryFile() as temp:
                 temp.write(slide[1].encode())
                 temp.flush()

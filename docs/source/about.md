@@ -4,6 +4,24 @@ Submission for langjam#0001
 
 I have been exploring literate programming and animation, the past few months so the langjam topic came as a surprise! While the initial goal was to build something like docco, I realised I could do an animation inside comments using a dsl. This is a prototype of an animated approach to literate programming first invented by Don Knuth. The code rendering time is long with terminalizer which I had not anticipated. There is an option that will strip code and store comment sequences inside a sqlite for fun and its used to explore a new metric of code quality - lines of comment / lines of code.
 
+The animation dsl
+
+```text
+dir/file1.py
+
+# animation::<name>:no1
+# ...
+# ...
+
+
+dir/file2.py
+
+# animation::name:no
+# ...
+# ...
+```
+
+
 first-class comments (interpretation): treat comment sequences as a value that can be freely passed, stored, serialized ... like python dictionaries + pickle or integers. A comment sequence is something separated by 0-width indentation of  codeblocks for now.
 
 Examples include - hello-world and fibonacci
@@ -13,30 +31,33 @@ Explore if this is feasible for larger pre-existing codebases.
 Add support for C style comments.
 ```
 
-Limitations - some edge cases need to be explored.
+Limitations - a lot!
 
-# Is this a quine ?
+# Demo
+
+<img src="_static/render1629596256328.gif">
 
 # Instructions
 
 ```sh
+git clone https://github.com/xyzzyapps/loom.git
+cd loom
 virtualenv env
 source env/bin/activate
 pip install -r requirements.txt
-python loom.py test.py
 ```
 
 Utilities for animation,
 
 ```sh
 brew install cowsay
-npm install -g terminalizer 
+npm install -g terminalizer
 ```
 
 ```sh
 python source/loom.py --generate-docs fibonacci build1 # builds the db and docco like docs with sphinx
 python source/loom.py --comment-stats # previous step is needed to create the database
-python source/loom.py --generate-terminal-show fibonacci build2 3
+python source/loom.py --generate-terminal-show fibonacci build2 3 start
 python source/loom.py --clean-source < hello-world/test.py
 ```
 
