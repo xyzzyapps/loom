@@ -1,4 +1,5 @@
 from flexicon import Lexer
+import tempfile
 from operator import itemgetter
 import re
 import time
@@ -14,6 +15,18 @@ def execute(conn, query, args):
     cur.execute(query, args)
     conn.commit()
     return cur.lastrowid
+
+def select_query(conn, query, params, mapper):
+    cur = conn.cursor()
+    if params:
+        cur.execute(query, params)
+    else:
+        cur.execute(query)
+
+    rows = cur.fetchall()
+
+    for row in rows:
+        mapper(row)
 
 def create_connection(db_file):
     """ create a database connection to a SQLite database """
@@ -108,6 +121,7 @@ def parse(st, print_wrapper, code_wrapper):
 
     current_code_sequence = ""
     current_comment_sequence = ""
+    sequence_index = 0
 
     for token in tokens:
         if line_count > 1:
@@ -122,18 +136,26 @@ def parse(st, print_wrapper, code_wrapper):
             current_comment_sequence += token[3]
             line_count += 1
         if token[0] == "LINE":
+            current_code_sequence += token[1]
             current_code_sequence += token[2]
             if len(token[1]) == 0:
                 if current_code_sequence != "" and current_comment_sequence != "":
+                    # print(str(sequence_index) + "@@@@@@" + current_code_sequence)
+                    # print(str(sequence_index) + "@@@@@@" + current_comment_sequence)
                     code_sequences.append(current_code_sequence)
                     comment_sequences.append(current_comment_sequence)
+                    sequence_index += 1
                     current_code_sequence = ""
                     current_comment_sequence = ""
+
             line_count += 1
         else:
             line_count += 1
 
     if current_code_sequence != "" and current_comment_sequence != "":
+        # print(str(sequence_index) + "@@@@@@" + current_code_sequence)
+        # print(str(sequence_index) + "@@@@@@" + current_comment_sequence)
+
         code_sequences.append(current_code_sequence)
         comment_sequences.append(current_comment_sequence)
 
@@ -153,7 +175,6 @@ if __name__ == "__main__":
 
     if arg1 == "--test":
         parse(sys.stdin.read(), output_printer, null_printer)
-
 
     if arg1 == "--generate-docs":
 
@@ -202,6 +223,7 @@ if __name__ == "__main__":
         show = {}
         arg2 = sys.argv[2]
         output_dir = ends_with_slash(sys.argv[3])
+        slide_delay = int(sys.argv[4])
 
         def run_parser(file_name):
             global conn
@@ -215,18 +237,53 @@ if __name__ == "__main__":
             for i, e in enumerate(sequences[1]):
                 if "animation::" in e:
                     lines = e.split("\n")
-                    name, no = lines[0].split("::")[1].split(":")
+                    first_line =  lines.pop(0)
+                    clean_comment = "\n".join(lines)
+                    name, no = first_line.split("::")[1].split(":")
 
                     if name in show:
                         code = sequences[0][i]
-                        show[name].append([no, e, code])
+                        show[name].append([no, clean_comment, code])
                     else:
                         code = sequences[0][i]
-                        show[name] = [[no, e, code]]
-
+                        show[name] = [[no, clean_comment, code]]
 
         dir_walk(arg2, run_parser)
+
         for slide in sorted(show["start"], key=itemgetter(0)):
-            print(slide[2])
-            time.sleep(5)
+            with tempfile.NamedTemporaryFile() as temp:
+                temp.write(slide[1].encode())
+                temp.flush()
+                os.system("cowsay -W 72 <" + temp.name)
+                time.sleep(slide_delay)
+            with tempfile.NamedTemporaryFile() as temp:
+                temp.write(slide[2].encode())
+                temp.flush()
+                os.system("cowsay -W 72 <" + temp.name)
+                time.sleep(slide_delay)
+
+    if arg1 == "--comment-stats":
+
+        comments_count = 0
+        code_count = 0
+
+        def comment_counter(row):
+            global comments_count
+            comments_count += len(row[3].split("\n"))
+
+        def code_counter(row):
+            global code_count
+            code_count += len(row[3].split("\n"))
+
+        conn = create_connection("codedb.db")
+        sql = """ SELECT * FROM codebase WHERE type=? """
+        select_query(conn, sql, ["comment"], comment_counter)
+        select_query(conn, sql, ["code"], code_counter)
+        print("comments loc: " + str(comments_count))
+        print("code loc: " + str(code_count))
+        print("ratio (higher is better): " + str(comments_count / code_count))
+
+
+
+
 
