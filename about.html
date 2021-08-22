@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Loom &#8212; Loom 2021 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="#" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="loom">
+<h1>Loom<a class="headerlink" href="#loom" title="Permalink to this headline">¶</a></h1>
+<p>Sumbission for langjam#0001</p>
+<p>While the inital goal was to build something like docco, later I realised I could do something like an animation inside comments using a dsl. The code rendering time is surprisingly long which I had not anticipated. There is also an options that will strip code and store comment sequences inside a sqlite for fun and it is used to explore a new metric of code quality - lines of comment / lines of code.</p>
+<p>first-class comments (interpretation): treat comment sequences as a value that can be freely passed, stored … like python dictionaries + pickle or intergers. A comment sequence is something seprated by 0-width indentaition of  codeblocks.</p>
+<p>Examples include - hello-world and fibonacci</p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="is-this-a-quine">
+<h1>Is this a quine ?<a class="headerlink" href="#is-this-a-quine" title="Permalink to this headline">¶</a></h1>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="instructions">
+<h1>Instructions<a class="headerlink" href="#instructions" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>virtualenv env
+<span class="nb">source</span> env/bin/activate
+pip install -r requirements.txt
+python loom.py test.py
+</pre></div>
+</div>
+<p>Additional utilities for animation,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">brew</span> <span class="n">install</span> <span class="n">cowsay</span>
+<span class="n">npm</span> <span class="n">install</span> <span class="o">-</span><span class="n">g</span> <span class="n">terminalizer</span> 
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">source</span><span class="o">/</span><span class="n">loom</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">generate</span><span class="o">-</span><span class="n">docs</span> <span class="n">fibonacci</span> <span class="n">build1</span>
+<span class="n">python</span> <span class="n">source</span><span class="o">/</span><span class="n">loom</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">comment</span><span class="o">-</span><span class="n">stats</span>
+<span class="n">python</span> <span class="n">loom</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">generate</span><span class="o">-</span><span class="n">terminal</span><span class="o">-</span><span class="n">show</span> <span class="n">fibonacci</span>
+</pre></div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="license-support">
+<h1>License Support<a class="headerlink" href="#license-support" title="Permalink to this headline">¶</a></h1>
+<p>Unless stated otherwise, all source code in this document and the documentation itself is under the <a class="reference external" href="https://creativecommons.org/licenses/by-nc-nd/4.0">Creative Commons Attribution Non Commercial No Derivatives</a> license.</p>
+<script src="https://gumroad.com/js/gumroad.js"></script>
+<p><a class="gumroad-button" href="https://gumroad.com/l/pkoQc">Support Loom</a></p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="about">
+<h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
+<p>I’m xyzzy for now. I’m a web developer into music and creative programming. I’m a solopreneur. Checkout my <a class="reference external" href="https://xyzzyapps.link">apps</a> where I explore literate programming. I have written my own tool with the help of cog preprocessor called wheel. I am currently exploring 3d animation with blender.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Loom</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Xyzzy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/about.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

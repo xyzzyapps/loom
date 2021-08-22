@@ -12,4 +12,4 @@ The fibonacci example uses code from,
 <https://marketplace.visualstudio.com/items?itemName=vsls-contrib.codetour>  
 <https://metacpan.org/pod/Smart::Comments>  
 
-Made with Vim while listening to medieval celtic and viking music.
+Made with Vim while listening to medieval music.
