@@ -1,13 +1,11 @@
-project = 'Project'
-copyright = '2021, Author'
-author = 'Author'
+project = 'Loom'
+copyright = '2021, Xyzzy'
+author = 'Xyzzy'
 release = '2021'
-extensions = [
-]
+extensions = ['myst_parser', 'sphinx.ext.todo']
 
 templates_path = ['_templates']
 exclude_patterns = []
-
 
 html_theme = 'alabaster'
 
