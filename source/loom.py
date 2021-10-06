@@ -1,7 +1,9 @@
 # animation::quine:1
 # Welcome!
+
 # imports
 
+from watchpoints import watch
 from flexicon import Lexer
 import tempfile
 from operator import itemgetter
@@ -12,12 +14,13 @@ import os
 import sqlite3
 from sqlite3 import Error
 
-# animation::quine:2
-# globals
+# end::animation
+
 
 conn = None
 
-# animation::quine:3
+# animation::quine:2
+
 # basic sql
 
 def execute(conn, query, args):
@@ -26,8 +29,7 @@ def execute(conn, query, args):
     conn.commit()
     return cur.lastrowid
 
-# animation::quine:4
-# basic sql
+# end::animation
 
 def select_query(conn, query, params, mapper):
     cur = conn.cursor()
@@ -40,8 +42,6 @@ def select_query(conn, query, params, mapper):
     for row in rows:
         mapper(row)
 
-# animation::quine:5
-
 def create_connection(db_file):
     """ create a database connection to a SQLite database """
     conn = None
@@ -51,8 +51,6 @@ def create_connection(db_file):
     except Error as e:
         print(e)
 
-# animation::quine:6
-
 sql_create_codebase_table = """
 CREATE TABLE IF NOT EXISTS codebase (
     file_path text NOT NULL,
@@ -61,8 +59,6 @@ CREATE TABLE IF NOT EXISTS codebase (
     line text NOT NULL
 );
 """
-
-# animation::quine:6
 
 def create_table(conn, create_table_sql):
     """ create a table from the create_table_sql statement
@@ -119,8 +115,6 @@ def string_state():
 
     return [getter, setter]
 
-# animation::quine:7
-
 def parse(st, print_wrapper, code_wrapper, with_fence=True):
     lexer = Lexer().simple(
         (r'(\n[\n ]*)', lambda _1: ('NL', _1)),
@@ -157,8 +151,8 @@ def parse(st, print_wrapper, code_wrapper, with_fence=True):
             current_comment_sequence += token[3]
             line_count += 1
         if token[0] == "LINE":
-            current_code_sequence += token[1]
-            current_code_sequence += token[2]
+            current_code_sequence += token[1] 
+            current_code_sequence += token[2] + "\n"
             if len(token[1]) == 0:
                 if current_code_sequence != "" and current_comment_sequence != "":
                     code_sequences.append(current_code_sequence)
@@ -185,6 +179,75 @@ def parse(st, print_wrapper, code_wrapper, with_fence=True):
         print_wrapper("\n```")
 
     return [code_sequences, comment_sequences]
+
+def parse_array(st):
+    lexer = Lexer().simple(
+        (r'(\n[\n ]*)', lambda _1: ('NL', _1)),
+        (r'^#(.+\n)', lambda _1: ('COMMENT', _1)),
+        (r'(\s*)(.+?)#(.+\n)', lambda _1, _2, _3: ('PARTIAL_COMMENT', _1, _2, _3)),
+        (r'^(\s*)(.+\n)', lambda _1, _2: ('LINE', _1, _2)),
+    )
+
+    tokens = lexer.lex(st)
+    is_program_beginning = True
+    line_count = 1
+    current_text = ""
+    partial_text = ""
+    sequences = []
+    last_token_type = "COMMENT"
+    token_type_changed = False
+
+    for token in tokens:
+        if line_count > 1:
+            is_program_beginning = False
+
+        if token[0] == "NL":
+            current_text += token[1]
+        if token[0] == "COMMENT":
+            if last_token_type != "COMMENT":
+                if partial_text:
+                    sequences.append([last_token_type, current_text])
+                sequences.append([last_token_type, current_text])
+                current_text = ""
+                partial_text = ""
+                last_token_type = "COMMENT"
+                token_type_changed = True
+
+            current_text += token[1]
+            line_count += 1
+        if token[0] == "PARTIAL_COMMENT":
+            if last_token_type != "PARTIAL_COMMENT":
+                if partial_text:
+                    sequences.append([last_token_type, current_text])
+                sequences.append([last_token_type, current_text])
+                current_text = ""
+                partial_text = ""
+                last_token_type = "PARTIAL_COMMENT"
+                token_type_changed = True
+            if len(token[2]) > 0:
+                current_text += token[1] # Spaces
+            current_text += token[2]
+            partial_text += token[3]
+            line_count += 1
+        if token[0] == "LINE":
+            if last_token_type != "LINE":
+                if partial_text:
+                    sequences.append([last_token_type, current_text])
+                sequences.append([last_token_type, current_text])
+                current_text = ""
+                partial_text = ""
+                last_token_type = "LINE"
+                token_type_changed = True
+
+            current_text += token[1]
+            current_text += token[2]
+            line_count += 1
+
+    if partial_text:
+        sequences.append([last_token_type, current_text])
+    sequences.append([last_token_type, current_text])
+
+    return sequences
 
 
 if __name__ == "__main__":
@@ -240,50 +303,81 @@ if __name__ == "__main__":
 
         show = {}
         arg2 = sys.argv[2]
-        output_dir = ends_with_slash(sys.argv[3])
-        slide_delay = int(sys.argv[4])
-        animation_name = sys.argv[5]
+        slide_delay = int(sys.argv[3])
+        animation_name = sys.argv[4]
 
         def run_parser(file_name):
             global conn
             global show
             file_contents = open(file_name).read()
-            file_printer = file_printer_prototype(output_dir, file_name)
-            sequences = parse(file_contents, file_printer, file_printer)
-            sql = '''INSERT INTO codebase(file_path, array_index, type, line)
-                VALUES(?,?,?,?)'''
+            sequences = parse_array(file_contents)
+            end_split_sequences = []
+            for s in sequences:
+                if "end::animation" in s[1]:
+                    splits = re.split("\n[\n]*", s[1])
+                    for split in splits:
+                        end_split_sequences.append(["COMMENT", split])
+                else:
+                    end_split_sequences.append(s)
 
-            for i, e in enumerate(sequences[1]):
-                if "animation::" in e:
-                    lines = e.split("\n")
+            break_loop = False
+            in_animation = False
+            code_sequences = []
+            comment_sequences = []
+            no = 0
+            current_animation = ""
+
+            while(1):
+                if len(end_split_sequences) == 0:
+                    break
+                sequence = end_split_sequences.pop(0)
+
+                if "animation::" in sequence[1]:
+                    lines = sequence[1].split("\n")
                     first_line =  lines.pop(0)
-                    clean_comment = "\n".join(lines)
-                    name, no = first_line.split("::")[1].split(":")
 
-                    if name in show:
-                        code = sequences[0][i]
-                        if "," in no:
-                            ns = no.split(",")
-                            for n in ns:
-                                show[name].append([n, clean_comment, code])
-                        else:
-                            show[name].append([no, clean_comment, code])
+                    clean_comment = "\n".join(lines)
+
+                    try:
+                        current_animation, no = first_line.split("::")[1].split(":")
+                        no = int(no)
+                    except:
+                        continue
+
+                    comment_sequences.append(clean_comment)
+                    continue
+
+                if "end::animation" in sequence[1]:
+                    if current_animation in show:
+                        show[current_animation].append([no, code_sequences, comment_sequences])
                     else:
-                        if "," in no:
-                            ns = no.split(",")
-                        code = sequences[0][i]
-                        show[name] = [[no, clean_comment, code]]
+                        show[current_animation] = [[no, code_sequences, comment_sequences]]
+                    comment_sequences = []
+                    code_sequences = []
+                    continue
+
+                if sequence[0] == "COMMENT" or sequence[0] == "PARTIAL_COMMENT":
+                    comment_sequences.append(sequence[1])
+
+
+                if sequence[0] == "LINE":
+                    code_sequences.append(sequence[1])
+
 
         dir_walk(arg2, run_parser)
 
-        for slide in sorted(show[animation_name], key=itemgetter(0)):
+        def takeFirst(elem):
+            return elem[0]
+
+        for slide in sorted(show[animation_name], key=takeFirst):
             with tempfile.NamedTemporaryFile() as temp:
-                temp.write(slide[1].encode())
+                temp.write("\n".join(slide[2]).encode())
                 temp.flush()
                 os.system("cowsay -W 72 <" + temp.name)
                 time.sleep(slide_delay)
+
             with tempfile.NamedTemporaryFile() as temp:
-                temp.write(slide[2].encode())
+                temp.write("\n".join(slide[1]).encode())
                 temp.flush()
                 os.system("cowsay -W 72 <" + temp.name)
                 time.sleep(slide_delay)
@@ -308,8 +402,4 @@ if __name__ == "__main__":
         print("comments loc: " + str(comments_count))
         print("code loc: " + str(code_count))
         print("ratio (higher is better): " + str(comments_count / code_count))
-
-
-
-
 

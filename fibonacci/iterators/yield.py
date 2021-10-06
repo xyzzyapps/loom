@@ -1,3 +1,4 @@
+# animation::start:8
 # With yield
 
 def F():
@@ -5,3 +6,5 @@ def F():
     while True:
         yield a
         a, b = b, a + b
+
+# end::animation
